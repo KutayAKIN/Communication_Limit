@@ -428,7 +428,7 @@ def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
     for d in range(n_device):
         if y_val[d] == 0:
-            B[300+d*n_class:(d+1)*n_class+300] = np.zeros((n_class,1))
+            B[n_device*n_class+d*n_class:(d+1)*n_class+(n_device*n_class)] = np.zeros((n_class,1))
 
     b_eq= b_eq*n_device/k
     constraint = [Act_mat @ Act2 >= B, eq_mat @ Act2 <= b_eq]
@@ -469,7 +469,7 @@ def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     #y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
     for d in range(n_device):
         if y_val[d] == 0:
-            B[300+d*n_class:(d+1)*n_class+300] = np.zeros((n_class,1))
+            B[n_device*n_class+d*n_class:(d+1)*n_class+(n_device*n_class)] = np.zeros((n_class,1))
     #B= B*n_device/k
     b_eq = b_eq * n_device/k
     constraint = [Act_mat @ Act2 >= B, eq_mat @ Act2 <= b_eq]
