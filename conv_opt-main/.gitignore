@@ -1,0 +1,26 @@
+Savefere.jpg
+Save.jpg
+Savefere.jpg
+Difference.jpg
+newdiff.jpg
+newone.jpg
+*.jpg
+*.npy
+*.pt
+MNIST/data
+*.csv
+CIFAR/data
+AdverseWeather/GPS Data
+AdverseWeather/Recordings
+*.docx
+*.xlsx
+runs/*
+combined_MNIST_runs
+CIFAR10/data
+CIFAR100/data
+runs/
+combined_CIFAR100_runs
+combined_CIFAR10_runs
+combined_AdverseWeather_runs
+BDD/*
+combined/*
