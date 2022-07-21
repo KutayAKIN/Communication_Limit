@@ -401,7 +401,7 @@ def Int_Coop_Action_norm_group(n_device,n_class,D_target,P_cond,D_0,n_cache,x_di
     
     return A_coop
 
-def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, k, C):
+def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
     A_coop = np.zeros((n_device*n_class,1),int)
     P_cond = P_cond.reshape(1,n_class,n_class)
 
@@ -442,7 +442,7 @@ def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     
     return A_coop, y_val
 
-def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, k, C):
+def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
     A_coop = np.zeros((n_device*n_class,1),int)
     P_cond = P_cond.reshape(1,n_class,n_class)
 

@@ -320,7 +320,7 @@ while sim_i<n_sim:
                 N_y_pred_coop10[i,:] = y_pred_stats(y_pred_coop10[i],n_class).reshape(-1)
                 N_y_pred_coop25[i,:] = y_pred_stats(y_pred_coop25[i],n_class).reshape(-1)
 
-            A_coop, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop,D_0_coop,n_cache,x_dist,N_y_pred_coop, k=10, C)
+            A_coop, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop,D_0_coop,n_cache,x_dist,N_y_pred_coop, C, k=10)
             A_coop_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop,D_0_coop,n_cache,x_dist,N_y_pred_coop)
             A_coop_group = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
@@ -329,7 +329,7 @@ while sim_i<n_sim:
                 else:
                     A_coop_group[f*n_class:(f+1)*n_class] = A_coop[f*n_class:(f+1)*n_class]
 
-            A_coop10, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10, k=2, C)
+            A_coop10, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10, C, k=2)
             A_coop10_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10)
             A_coop10_group = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
@@ -338,7 +338,7 @@ while sim_i<n_sim:
                 else:
                     A_coop10_group[f*n_class:(f+1)*n_class] = A_coop10[f*n_class:(f+1)*n_class]
 
-            A_coop25, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25, k=5, C)
+            A_coop25, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25, C, k=5)
             A_coop25_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25)
             A_coop25_group = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
@@ -347,7 +347,7 @@ while sim_i<n_sim:
                 else:
                     A_coop25_group[f*n_class:(f+1)*n_class] = A_coop25[f*n_class:(f+1)*n_class]
 
-            A_feed10_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10, k=2, C)
+            A_feed10_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10, C, k=2)
             A_feed10_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10)
             A_feed10 = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
@@ -356,7 +356,7 @@ while sim_i<n_sim:
                 else:
                     A_feed10[f*n_class:(f+1)*n_class] = A_feed10_feed[f*n_class:(f+1)*n_class]
 
-            A_feed25_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25, k=5, C)
+            A_feed25_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25, C, k=5)
             A_feed25_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25)
             A_feed25 = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
@@ -365,7 +365,7 @@ while sim_i<n_sim:
                 else:
                     A_feed25[f*n_class:(f+1)*n_class] = A_feed25_feed[f*n_class:(f+1)*n_class]
 
-            A_feed50_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50, k=10, C)
+            A_feed50_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50, C, k=10)
             A_feed50_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50)
             A_feed50 = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
