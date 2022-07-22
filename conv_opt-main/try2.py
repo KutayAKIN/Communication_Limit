@@ -41,6 +41,7 @@ eq_mat = np.repeat(np.eye(n_device),n_class,axis=1)
 b_eq = np.ones((n_device,1))*n_cache
 y = eq_mat@Act
 C = np.transpose(eq_mat)@C@eq_mat
+print(C.shape)
 C = np.transpose(C)@C
 C = sqrtm(C)
 print(C.shape)
