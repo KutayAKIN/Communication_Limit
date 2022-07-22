@@ -422,9 +422,9 @@ def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
     y = eq_mat@Act
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+y.T @ C @ y)
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+cp.quad_form(y, C))
     prob = cp.Problem(obj, constraint)
-    prob.solve(verbose=True)
+    prob.solve()
     y_val = (eq_mat @ Act.value)/n_cache
     y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
     for d in range(n_device):
@@ -464,9 +464,9 @@ def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     b_eq = np.ones((n_device,1))*n_cache
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+y.T @ C @ y)
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+cp.quad_form(y, C))
     prob = cp.Problem(obj, constraint)
-    prob.solve(verbose=True)
+    prob.solve()
     y_val = np.random.permutation(np.concatenate((np.ones((k,1),int),np.zeros((n_device-k,1),int)),axis=0))
     #y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
     for d in range(n_device):

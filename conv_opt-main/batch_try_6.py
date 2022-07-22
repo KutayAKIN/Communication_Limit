@@ -140,7 +140,7 @@ C = np.zeros((n_device,n_device))
 for i in range(n_device):
     for j in range(i):
         C[i,j] = np.random.rand(1,1)
-        C[j,i] = np.random.rand(1,1)
+        C[j,i] = C[i,j]
 
 sim_bar = tqdm(total=n_sim)
 sim_i = 0
