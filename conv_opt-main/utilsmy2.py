@@ -422,7 +422,7 @@ def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
     y = eq_mat@Act
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+cp.quad_form(y, C))
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+C@y)
     prob = cp.Problem(obj, constraint)
     prob.solve()
     y_val = (eq_mat @ Act.value)/n_cache
@@ -458,13 +458,97 @@ def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
 
     Act = cp.Variable((n_class*n_device,1))
     Act2 = cp.Variable((n_class*n_device,1))
-    y = eq_mat@Act
     Act_mat = np.concatenate((np.eye(n_class*n_device),-np.eye(n_class*n_device)),axis=0)
     eq_mat = np.repeat(np.eye(n_device),n_class,axis=1)
     b_eq = np.ones((n_device,1))*n_cache
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
+    y = eq_mat@Act
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+cp.quad_form(y, C))
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+C@y)
+    prob = cp.Problem(obj, constraint)
+    prob.solve()
+    y_val = np.random.permutation(np.concatenate((np.ones((k,1),int),np.zeros((n_device-k,1),int)),axis=0))
+    #y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
+    for d in range(n_device):
+        if y_val[d] == 0:
+            B[n_device*n_class+d*n_class:(d+1)*n_class+(n_device*n_class)] = np.zeros((n_class,1))
+    #B= B*n_device/k
+    b_eq = b_eq * n_device/k
+    constraint = [Act_mat @ Act2 >= B, eq_mat @ Act2 <= b_eq]
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act2 - D_target))
+    prob = cp.Problem(obj, constraint)
+    prob.solve()
+    for i in range(n_device):
+        act = Act2.value[i*n_class:(i+1)*n_class]    
+        #act = act * n_cache/sum(act)
+        A_coop[i*n_class:(i+1)*n_class] = np.array(saferound(act.reshape(-1),places=0),int).reshape(-1,1)
+    
+    return A_coop, y_val
+
+def Int_Coop_Action_norm_group4(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
+    A_coop = np.zeros((n_device*n_class,1),int)
+    P_cond = P_cond.reshape(1,n_class,n_class)
+    alpha = 0.1
+    P_cond = np.repeat(P_cond,n_device,axis=0)
+
+    P_occ = x_dist.reshape(n_device,-1,1) * P_cond
+
+    P_condr = P_occ /(np.sum(P_occ,1).reshape(n_device,1,-1)+1e-10)
+
+    P_tuple = [P_condr[i] for i in range(n_device)]
+    P_Condr = np.concatenate(P_tuple,axis=1)
+
+    Act = cp.Variable((n_class*n_device,1))
+    Act2 = cp.Variable((n_class*n_device,1))
+    Act_mat = np.concatenate((np.eye(n_class*n_device),-np.eye(n_class*n_device)),axis=0)
+    eq_mat = np.repeat(np.eye(n_device),n_class,axis=1)
+    b_eq = np.ones((n_device,1))*n_cache
+    B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
+    y = eq_mat@Act
+    constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+0.1*C@y)
+    prob = cp.Problem(obj, constraint)
+    prob.solve()
+    y_val = np.random.permutation(np.concatenate((np.ones((k,1),int),np.zeros((n_device-k,1),int)),axis=0))
+    #y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
+    for d in range(n_device):
+        if y_val[d] == 0:
+            B[n_device*n_class+d*n_class:(d+1)*n_class+(n_device*n_class)] = np.zeros((n_class,1))
+    #B= B*n_device/k
+    b_eq = b_eq * n_device/k
+    constraint = [Act_mat @ Act2 >= B, eq_mat @ Act2 <= b_eq]
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act2 - D_target))
+    prob = cp.Problem(obj, constraint)
+    prob.solve()
+    for i in range(n_device):
+        act = Act2.value[i*n_class:(i+1)*n_class]    
+        #act = act * n_cache/sum(act)
+        A_coop[i*n_class:(i+1)*n_class] = np.array(saferound(act.reshape(-1),places=0),int).reshape(-1,1)
+    
+    return A_coop, y_val
+
+def Int_Coop_Action_norm_group5(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
+    A_coop = np.zeros((n_device*n_class,1),int)
+    P_cond = P_cond.reshape(1,n_class,n_class)
+    alpha = 0.1
+    P_cond = np.repeat(P_cond,n_device,axis=0)
+
+    P_occ = x_dist.reshape(n_device,-1,1) * P_cond
+
+    P_condr = P_occ /(np.sum(P_occ,1).reshape(n_device,1,-1)+1e-10)
+
+    P_tuple = [P_condr[i] for i in range(n_device)]
+    P_Condr = np.concatenate(P_tuple,axis=1)
+
+    Act = cp.Variable((n_class*n_device,1))
+    Act2 = cp.Variable((n_class*n_device,1))
+    Act_mat = np.concatenate((np.eye(n_class*n_device),-np.eye(n_class*n_device)),axis=0)
+    eq_mat = np.repeat(np.eye(n_device),n_class,axis=1)
+    b_eq = np.ones((n_device,1))*n_cache
+    B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
+    y = eq_mat@Act
+    constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+0.1*C@y)
     prob = cp.Problem(obj, constraint)
     prob.solve()
     y_val = np.random.permutation(np.concatenate((np.ones((k,1),int),np.zeros((n_device-k,1),int)),axis=0))
@@ -808,7 +892,7 @@ def suggested_C_mat(n_device, n_class):
         best_selections[:,i] = besti
     return C_mat ,best_selections
 
-def Int_Ind_Action_norm(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x):
+def Int_Ind_Action_norm(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x,k):
 
     A_ind = np.zeros((n_device*n_class,1),int)
 
@@ -824,7 +908,7 @@ def Int_Ind_Action_norm(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x)
         act = cp.Variable((n_class,1))
         act_mat = np.concatenate((np.eye(n_class),-np.eye(n_class)),axis=0)
         eq_mat = np.ones((1,n_class))
-        b_eq = np.ones((1,1))*n_cache
+        b_eq = np.ones((1,1))*n_cache*n_device/k
         b = np.concatenate((np.zeros((n_class,1)),-N_x[i,:].reshape(-1,1)),axis=0)
         constraint = [act_mat @ act >= b, eq_mat @ act == b_eq ]
         

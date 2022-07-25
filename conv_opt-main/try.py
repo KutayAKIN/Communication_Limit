@@ -38,7 +38,7 @@ prob = cp.Problem(obj, constraint)
 
 prob.solve()
 y_val = (eq_mat @ Act.value)/n_cache
-
+print(y_val.shape)
 y_val = np.array(saferound(y_val.reshape(-1),places=0),int)
 for i in range(n_device):
     if y_val[i] == 1:
@@ -47,6 +47,4 @@ for i in range(n_device):
         A_coop[i*n_class:(i+1)*n_class] = np.array(saferound(act.reshape(-1),places=0),int).reshape(-1,1)
     else:
         A_coop[i*n_class:(i+1)*n_class] = np.zeros((n_class,1),dtype=int)
-print(y_val)
-print(sum(A_coop))
-print(A_coop)
+

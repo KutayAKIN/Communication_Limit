@@ -10,11 +10,9 @@ n_cache = 2
 n_size = 200
 n_obs = 1000
 k=10
-C = np.zeros((n_device,n_device))
+C = np.zeros((1,n_device))
 for i in range(n_device):
-    for j in range(i):
-        C[i,j] = np.random.rand(1,1)
-        C[j,i] = C[i,j]
+    C[0,i] = np.random.rand(1,1)
 
 D_0 = np.zeros((n_class,1),int)
 D_target = np.ones((n_class,1))*n_size/n_class
@@ -40,15 +38,17 @@ Act_mat = np.concatenate((np.eye(n_class*n_device),-np.eye(n_class*n_device)),ax
 eq_mat = np.repeat(np.eye(n_device),n_class,axis=1)
 b_eq = np.ones((n_device,1))*n_cache
 y = eq_mat@Act
-C = np.transpose(eq_mat)@C@eq_mat
-print(C.shape)
-C = np.transpose(C)@C
-C = sqrtm(C)
+#C = np.transpose(eq_mat)@C@eq_mat
+#print(C.shape)
+#C = np.transpose(C)@C
+#C = sqrtm(C)
 print(C.shape)
 B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
 constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act == k*n_cache ]
-obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+cp.sum_squares(C@Act))
+#obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+cp.sum_squares(C@Act))
+obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+ C@y)
 prob = cp.Problem(obj, constraint)
 prob.solve()
+print(Act.value)
 print("Is DPP? ", prob.is_dcp(dpp=True))
 print("Is DCP? ", prob.is_dcp(dpp=False))

@@ -60,6 +60,13 @@ KL_coop = np.zeros((n_sim,n_rounds+1))
 KL_lwb = np.zeros((n_sim,n_rounds+1))
 KL_coop10 = np.zeros((n_sim,n_rounds+1))
 KL_coop25 = np.zeros((n_sim,n_rounds+1))
+cost_feed10 = np.zeros((n_sim,n_rounds+1))
+cost_feed25 = np.zeros((n_sim,n_rounds+1))
+cost_feed = np.zeros((n_sim,n_rounds+1))
+cost_feed50 = np.zeros((n_sim,n_rounds+1))
+cost_coop = np.zeros((n_sim,n_rounds+1))
+cost_coop10 = np.zeros((n_sim,n_rounds+1))
+cost_coop25 = np.zeros((n_sim,n_rounds+1))
 
 if create_data:
     create_synt_dataset("./synthetic/data",n_features,n_class,2000,0.8,0.2)
@@ -136,11 +143,10 @@ feed50_acc = np.zeros((n_sim,n_rounds+1))
 coop_acc = np.zeros((n_sim,n_rounds+1))
 coop10_acc = np.zeros((n_sim,n_rounds+1))
 coop25_acc = np.zeros((n_sim,n_rounds+1))
-C = np.zeros((n_device,n_device))
+C = np.zeros((1,n_device))
 for i in range(n_device):
-    for j in range(i):
-        C[i,j] = np.random.rand(1,1)
-        C[j,i] = C[i,j]
+    C[0,i] = 10*np.random.rand(1,1)
+
 
 sim_bar = tqdm(total=n_sim)
 sim_i = 0
@@ -320,56 +326,56 @@ while sim_i<n_sim:
                 N_y_pred_coop10[i,:] = y_pred_stats(y_pred_coop10[i],n_class).reshape(-1)
                 N_y_pred_coop25[i,:] = y_pred_stats(y_pred_coop25[i],n_class).reshape(-1)
 
-            A_coop, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop,D_0_coop,n_cache,x_dist,N_y_pred_coop, C, k=10)
+            A_coop, y_val_coop = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop,D_0_coop,n_cache,x_dist,N_y_pred_coop, C, k=10)
             A_coop_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop,D_0_coop,n_cache,x_dist,N_y_pred_coop)
             A_coop_group = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
-                if y_val[f] == 0:
+                if y_val_coop[f] == 0:
                     A_coop_group[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_coop_ind[f*n_class:(f+1)*n_class]
                 else:
                     A_coop_group[f*n_class:(f+1)*n_class] = A_coop[f*n_class:(f+1)*n_class]
 
-            A_coop10, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10, C, k=2)
+            A_coop10, y_val_coop10 = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10, C, k=2)
             A_coop10_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10)
             A_coop10_group = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
-                if y_val[f] == 0:
+                if y_val_coop10[f] == 0:
                     A_coop10_group[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_coop10_ind[f*n_class:(f+1)*n_class]
                 else:
                     A_coop10_group[f*n_class:(f+1)*n_class] = A_coop10[f*n_class:(f+1)*n_class]
 
-            A_coop25, y_val = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25, C, k=5)
+            A_coop25, y_val_coop25 = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25, C, k=5)
             A_coop25_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25)
             A_coop25_group = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
-                if y_val[f] == 0:
+                if y_val_coop25[f] == 0:
                     A_coop25_group[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_coop25_ind[f*n_class:(f+1)*n_class]
                 else:
                     A_coop25_group[f*n_class:(f+1)*n_class] = A_coop25[f*n_class:(f+1)*n_class]
 
-            A_feed10_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10, C, k=2)
+            A_feed10_feed, y_val_feed10 = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10, C, k=2)
             A_feed10_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10)
             A_feed10 = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
-                if y_val[f] == 0:
+                if y_val_feed10[f] == 0:
                     A_feed10[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_feed10_ind[f*n_class:(f+1)*n_class]
                 else:
                     A_feed10[f*n_class:(f+1)*n_class] = A_feed10_feed[f*n_class:(f+1)*n_class]
 
-            A_feed25_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25, C, k=5)
+            A_feed25_feed, y_val_feed25 = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25, C, k=5)
             A_feed25_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25)
             A_feed25 = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
-                if y_val[f] == 0:
+                if y_val_feed25[f] == 0:
                     A_feed25[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_feed25_ind[f*n_class:(f+1)*n_class]
                 else:
                     A_feed25[f*n_class:(f+1)*n_class] = A_feed25_feed[f*n_class:(f+1)*n_class]
 
-            A_feed50_feed, y_val = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50, C, k=10)
+            A_feed50_feed, y_val_feed50 = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50, C, k=10)
             A_feed50_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50)
             A_feed50 = np.zeros((n_device*n_class,1),int)
             for f in range(n_device):
-                if y_val[f] == 0:
+                if y_val_feed50[f] == 0:
                     A_feed50[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_feed50_ind[f*n_class:(f+1)*n_class]
                 else:
                     A_feed50[f*n_class:(f+1)*n_class] = A_feed50_feed[f*n_class:(f+1)*n_class]
@@ -471,15 +477,23 @@ while sim_i<n_sim:
             D_0_coop10 = dataset_stat(dataset_coop10,n_class,n_features)
             D_0_coop25 = dataset_stat(dataset_coop25,n_class,n_features)
 
-            KL_feed10[sim_i-1,round_i+1] = cp.norm(D_0_feed10-D_target).value/sum(D_target)
-            print(D_0_feed10-D_target)
-            KL_feed25[sim_i-1,round_i+1] = cp.norm(D_0_feed25-D_target).value/sum(D_target)
-            KL_feed[sim_i-1,round_i+1] = cp.norm(D_0_feed-D_target).value/sum(D_target)
-            KL_feed50[sim_i-1, round_i+1] = cp.norm(D_0_feed50-D_target).value/sum(D_target)
+            KL_feed10[sim_i-1,round_i+1] = (cp.norm(D_0_feed10-D_target).value/sum(D_target))#+(C@y_val_feed10)*10
+            KL_feed25[sim_i-1,round_i+1] = (cp.norm(D_0_feed25-D_target).value/sum(D_target))#+(C@y_val_feed25)*4
+            KL_feed[sim_i-1,round_i+1] = (cp.norm(D_0_feed-D_target).value/sum(D_target))#+C@np.ones((n_device,1))
+            KL_feed50[sim_i-1, round_i+1] = (cp.norm(D_0_feed50-D_target).value/sum(D_target))#+(C@y_val_feed50)*2
             #KL_lwb[sim_i-1,round_i+1] = cp.norm(D_0_lwb-D_target).value/sum(D_target)
-            KL_coop[sim_i-1, round_i+1] = cp.norm(D_0_coop-D_target).value/sum(D_target)
-            KL_coop10[sim_i-1, round_i+1] = cp.norm(D_0_coop10-D_target).value/sum(D_target)
-            KL_coop25[sim_i-1, round_i+1] = cp.norm(D_0_coop25-D_target).value/sum(D_target)
+            KL_coop[sim_i-1, round_i+1] = cp.norm(D_0_coop-D_target).value/sum(D_target)#+(C@y_val_coop)*2
+            KL_coop10[sim_i-1, round_i+1] = cp.norm(D_0_coop10-D_target).value/sum(D_target)#+(C@y_val_coop10)*10
+            KL_coop25[sim_i-1, round_i+1] = cp.norm(D_0_coop25-D_target).value/sum(D_target)#+(C@y_val_coop25)*4
+
+            cost_feed10[sim_i-1,round_i+1] = (C@y_val_feed10)*10
+            cost_feed25[sim_i-1,round_i+1] = (C@y_val_feed25)*4
+            cost_feed[sim_i-1,round_i+1] = C@np.ones((n_device,1))
+            cost_feed50[sim_i-1,round_i+1] = (C@y_val_feed50)*2
+            cost_coop[sim_i-1,round_i+1] = (C@y_val_coop)*2
+            cost_coop10[sim_i-1,round_i+1] = (C@y_val_coop10)*10
+            cost_coop25[sim_i-1,round_i+1] = (C@y_val_coop25)*4
+
 
         sim_bar.update(1) 
     else:
@@ -612,4 +626,78 @@ else:
     plt.legend(fontsize=40)
     plt.tight_layout()
 
-    plt.savefig("plots/sim_synt_action_group10.jpg")
+    plt.savefig("plots/sim_synt_action_group16.jpg")
+
+    cost_feed25_df = pd.DataFrame(cost_feed25.reshape(-1,1),columns=["L2"])
+    cost_feed25_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    cost_feed10_df = pd.DataFrame(cost_feed10.reshape(-1,1),columns=["L2"])
+    cost_feed10_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    cost_feed_df = pd.DataFrame(cost_feed.reshape(-1,1),columns=["L2"])
+    cost_feed_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    cost_feed50_df = pd.DataFrame(cost_feed50.reshape(-1,1),columns=["L2"])
+    cost_feed50_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    #lwb_df = pd.DataFrame(KL_lwb.reshape(-1,1),columns=["L2"])
+    #lwb_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    cost_coop_df = pd.DataFrame(cost_coop.reshape(-1,1),columns=["L2"])
+    cost_coop_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    cost_coop10_df = pd.DataFrame(cost_coop10.reshape(-1,1),columns=["L2"])
+    cost_coop10_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+    cost_coop25_df = pd.DataFrame(cost_coop25.reshape(-1,1),columns=["L2"])
+    cost_coop25_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
+
+    cost_feed25_df.to_csv("data/Synt_cost_feed25_L2_group.csv")
+    cost_feed10_df.to_csv("data/Synt_cost_feed10_L2_group.csv")
+    cost_feed_df.to_csv("data/Synt_cost_Feed_L2_group.csv")
+    cost_feed50_df.to_csv("data/Synt_cost_feed50_L2_group.csv")
+    #lwb_df.to_csv("data/Int_Lwb_L2_group.csv")
+    cost_coop_df.to_csv("data/Synt_cost_coop_L2_group.csv")
+    cost_coop10_df.to_csv("data/Synt_cost_coop10_L2_group.csv")
+    cost_coop25_df.to_csv("data/Synt_cost_coop25_L2_group.csv")
+
+    #fig, ax = plt.subplots(figsize=(30,20),dpi=600)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(30, 20), dpi = 800)
+    #sns.lineplot(data=feed25_df,x="Round",y="L2",linewidth=3,color='red',linestyle='--')
+    #sns.lineplot(data=feed10_df,x="Round",y="L2",linewidth=3,color='blue',linestyle='--')
+    #sns.lineplot(data=feed50_df,x="Round",y="L2",linewidth=3,color='green',linestyle='--')
+    #sns.lineplot(data=coop10_df,x="Round",y="L2",label="k=2",linewidth=3,color='blue',linestyle='-')
+    #sns.lineplot(data=coop25_df,x="Round",y="L2",label="k=5",linewidth=3,color='red',linestyle='-')
+    #sns.lineplot(data=coop_df,x="Round",y="L2",label="k=10",linewidth=3,color='green',linestyle='-')
+    #sns.lineplot(data=feed_df,x="Round",y="L2",label="k=20",linewidth=3,linestyle='-')
+    #sns.lineplot(data=lwb_df,x="Round",y="L2",label="Lower-Bound",linewidth=3,linestyle='-.')
+    ax1.set_title("Random Selection", fontsize = 40)
+    ax2.set_title("Boolean Convex", fontsize = 40)
+    plt.subplot(1, 2, 1)
+    sns.lineplot(data=cost_feed10_df,x="Round",y="L2",linewidth=3,label="k=2",color='blue',linestyle='--')
+    sns.lineplot(data=cost_feed25_df,x="Round",y="L2",linewidth=3,label="k=5",color='red',linestyle='--')
+    sns.lineplot(data=cost_feed50_df,x="Round",y="L2",linewidth=3,label="k=10",color='green',linestyle='--')
+    sns.lineplot(data=cost_feed_df,x="Round",y="L2",label="k=20",color='black',linewidth=3,linestyle='-')
+    #sns.lineplot(data=lwb_df,x="Round",y="L2",label="Lower-Bound",linewidth=3,linestyle='-.')
+    
+    plt.grid(linestyle='--', linewidth=2)
+    plt.xlabel("Round $i$",fontweight="bold" ,fontsize=24)
+    plt.ylabel("L2 Norm",fontweight="bold" ,fontsize=24)
+    plt.rcParams["font.size"]=18
+    plt.rcParams["axes.linewidth"]=2
+    ax1.xaxis.set_tick_params(labelsize=20,width=10)
+    ax1.yaxis.set_tick_params(labelsize=20,width=10)
+    plt.legend(fontsize=40)
+    plt.tight_layout()
+    #fig, ax = plt.subplots(figsize=(30,20),dpi=600)
+    plt.subplot(1, 2, 2)
+    sns.lineplot(data=cost_coop10_df,x="Round",y="L2",label="k=2",linewidth=3,color='blue',linestyle='-')
+    sns.lineplot(data=cost_coop25_df,x="Round",y="L2",label="k=5",linewidth=3,color='red',linestyle='-')
+    sns.lineplot(data=cost_coop_df,x="Round",y="L2",label="k=10",linewidth=3,color='green',linestyle='-')
+    sns.lineplot(data=cost_feed_df,x="Round",y="L2",label="k=20",color='black',linewidth=3,linestyle='-')
+    #sns.lineplot(data=lwb_df,x="Round",y="L2",label="Lower-Bound",linewidth=3,linestyle='-.')
+    #plt.title("Boolean Convex")
+    plt.grid(linestyle='--', linewidth=2)
+    plt.xlabel("Round $i$",fontweight="bold" ,fontsize=24)
+    plt.ylabel("L2 Norm",fontweight="bold" ,fontsize=24)
+    plt.rcParams["font.size"]=18
+    plt.rcParams["axes.linewidth"]=2
+    ax2.xaxis.set_tick_params(labelsize=20,width=10)
+    ax2.yaxis.set_tick_params(labelsize=20,width=10)
+    plt.legend(fontsize=40)
+    plt.tight_layout()
+
+    plt.savefig("plots/sim_synt_action_group17.jpg")
