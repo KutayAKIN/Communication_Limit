@@ -15,7 +15,7 @@ from synt_model import Classifier, init_weights
 
 n_sim = 10
 n_rounds = 10
-n_class = 15
+n_class = 50#15
 n_device =20
 n_obs = 1000
 n_cache = 2
@@ -306,7 +306,7 @@ while sim_i<n_sim:
         for round_i in range(n_rounds):
 
             D_target = np.ones((n_class,1))*(sum(D_target) + n_cache*n_device)/n_class
-            
+            #D_target = np.ones((n_class,1))*(sum(D_target))/n_class
             for i in range(n_device):
 
                 obs_datasets[i] = create_obs_datasets(N_x[i],n_obs,X_train,y_train,n_features)
@@ -333,7 +333,7 @@ while sim_i<n_sim:
                 if y_val_coop[f] == 0:
                     A_coop_group[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_coop_ind[f*n_class:(f+1)*n_class]
                 else:
-                    A_coop_group[f*n_class:(f+1)*n_class] = A_coop_ind[f*n_class:(f+1)*n_class]
+                    A_coop_group[f*n_class:(f+1)*n_class] = A_coop[f*n_class:(f+1)*n_class]
 
             A_coop10, y_val_coop10 = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10, C, k=2)
             A_coop10_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop10,D_0_coop10,n_cache,x_dist,N_y_pred_coop10, k=2)
@@ -342,7 +342,7 @@ while sim_i<n_sim:
                 if y_val_coop10[f] == 0:
                     A_coop10_group[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_coop10_ind[f*n_class:(f+1)*n_class]
                 else:
-                    A_coop10_group[f*n_class:(f+1)*n_class] = A_coop10_ind[f*n_class:(f+1)*n_class]
+                    A_coop10_group[f*n_class:(f+1)*n_class] = A_coop10[f*n_class:(f+1)*n_class]
 
             A_coop25, y_val_coop25 = Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25, C, k=5)
             A_coop25_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_coop25,D_0_coop25,n_cache,x_dist,N_y_pred_coop25, k=5)
@@ -351,7 +351,7 @@ while sim_i<n_sim:
                 if y_val_coop25[f] == 0:
                     A_coop25_group[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_coop25_ind[f*n_class:(f+1)*n_class]
                 else:
-                    A_coop25_group[f*n_class:(f+1)*n_class] = A_coop25_ind[f*n_class:(f+1)*n_class]
+                    A_coop25_group[f*n_class:(f+1)*n_class] = A_coop25[f*n_class:(f+1)*n_class]
 
             A_feed10_feed, y_val_feed10 = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10, C, k=2)
             A_feed10_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10, k=2)
@@ -360,7 +360,7 @@ while sim_i<n_sim:
                 if y_val_feed10[f] == 0:
                     A_feed10[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_feed10_ind[f*n_class:(f+1)*n_class]
                 else:
-                    A_feed10[f*n_class:(f+1)*n_class] = A_feed10_ind[f*n_class:(f+1)*n_class]
+                    A_feed10[f*n_class:(f+1)*n_class] = A_feed10[f*n_class:(f+1)*n_class]
 
             A_feed25_feed, y_val_feed25 = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25, C, k=5)
             A_feed25_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25, k=5)
@@ -369,7 +369,7 @@ while sim_i<n_sim:
                 if y_val_feed25[f] == 0:
                     A_feed25[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_feed25_ind[f*n_class:(f+1)*n_class]
                 else:
-                    A_feed25[f*n_class:(f+1)*n_class] = A_feed25_ind[f*n_class:(f+1)*n_class]
+                    A_feed25[f*n_class:(f+1)*n_class] = A_feed25[f*n_class:(f+1)*n_class]
 
             A_feed50_feed, y_val_feed50 = Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50, C, k=10)
             A_feed50_ind = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50, k=10)
@@ -378,7 +378,7 @@ while sim_i<n_sim:
                 if y_val_feed50[f] == 0:
                     A_feed50[f*n_class:(f+1)*n_class] = np.zeros((n_class,1),int)#A_feed50_ind[f*n_class:(f+1)*n_class]
                 else:
-                    A_feed50[f*n_class:(f+1)*n_class] = A_feed50_ind[f*n_class:(f+1)*n_class]
+                    A_feed50[f*n_class:(f+1)*n_class] = A_feed50[f*n_class:(f+1)*n_class]
             #A_feed10_feed = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed10,D_0_feed10,n_cache,x_dist,N_y_pred_feed10)
             #A_feed25_feed = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed25,D_0_feed25,n_cache,x_dist,N_y_pred_feed25)
             #A_feed50_feed = Int_Ind_Action_norm(n_device,n_class,D_target,P_cond_feed50,D_0_feed50,n_cache,x_dist,N_y_pred_feed50)
@@ -626,7 +626,7 @@ else:
     plt.legend(fontsize=40)
     plt.tight_layout()
 
-    plt.savefig("plots/sim_synt_action_group20.jpg")
+    plt.savefig("plots/sim_synt_action_group120.jpg")
 
     cost_feed25_df = pd.DataFrame(cost_feed25.reshape(-1,1),columns=["L2"])
     cost_feed25_df["Round"] = [i for i in range(n_rounds+1)]*n_sim
@@ -700,4 +700,4 @@ else:
     plt.legend(fontsize=40)
     plt.tight_layout()
 
-    plt.savefig("plots/sim_synt_action_group21.jpg")
+    plt.savefig("plots/sim_synt_action_group121.jpg")

@@ -404,7 +404,7 @@ def Int_Coop_Action_norm_group(n_device,n_class,D_target,P_cond,D_0,n_cache,x_di
 def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
     A_coop = np.zeros((n_device*n_class,1),int)
     P_cond = P_cond.reshape(1,n_class,n_class)
-    alpha = 0.1
+    alpha = 0
     P_cond = np.repeat(P_cond,n_device,axis=0)
 
     P_occ = x_dist.reshape(n_device,-1,1) * P_cond
@@ -422,7 +422,7 @@ def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
     y = eq_mat@Act
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+C@y)
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+alpha*C@y)
     prob = cp.Problem(obj, constraint)
     prob.solve()
     y_val = (eq_mat @ Act.value)/n_cache
@@ -446,7 +446,7 @@ def Int_Coop_Action_norm_group2(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
 def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
     A_coop = np.zeros((n_device*n_class,1),int)
     P_cond = P_cond.reshape(1,n_class,n_class)
-    alpha = 0.1
+    alpha = 0
     P_cond = np.repeat(P_cond,n_device,axis=0)
 
     P_occ = x_dist.reshape(n_device,-1,1) * P_cond
@@ -464,7 +464,7 @@ def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
     y = eq_mat@Act
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+C@y)
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+alpha*C@y)
     prob = cp.Problem(obj, constraint)
     prob.solve()
     y_val = np.random.permutation(np.concatenate((np.ones((k,1),int),np.zeros((n_device-k,1),int)),axis=0))
@@ -488,7 +488,7 @@ def Int_Coop_Action_norm_group3(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
 def Int_Coop_Action_norm_group4(n_device,n_class,D_target,P_cond,D_0,n_cache,x_dist,N_x, C, k):
     A_coop = np.zeros((n_device*n_class,1),int)
     P_cond = P_cond.reshape(1,n_class,n_class)
-    alpha = 0.1
+    alpha = 0
     P_cond = np.repeat(P_cond,n_device,axis=0)
 
     P_occ = x_dist.reshape(n_device,-1,1) * P_cond
@@ -506,7 +506,7 @@ def Int_Coop_Action_norm_group4(n_device,n_class,D_target,P_cond,D_0,n_cache,x_d
     B = np.concatenate((np.zeros((n_class*n_device,1)),-N_x.reshape(-1,1)),axis=0)
     y = eq_mat@Act
     constraint = [Act_mat @ Act >= B, eq_mat @ Act <= b_eq, np.ones((1,n_device)) @ eq_mat @ Act <= k*n_cache ]
-    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+0.1*C@y)
+    obj = cp.Minimize(cp.sum_squares(D_0 + P_Condr @ Act - D_target)+alpha*C@y)
     prob = cp.Problem(obj, constraint)
     prob.solve()
     y_val = np.random.permutation(np.concatenate((np.ones((k,1),int),np.zeros((n_device-k,1),int)),axis=0))
@@ -1199,6 +1199,31 @@ def create_xdist2(n_device,n_class,obs_clss,n_obs):
         x_dist[i,1]  =  np.ceil(np.sum(x_dist[i],0)) + np.random.rand()
         x_dist[i] = np.random.permutation(x_dist[i])
 
+    x_dist = x_dist / np.sum(x_dist,1).reshape(-1,1)
+
+    N_x = np.zeros((n_device,n_class),dtype=int)
+    for i in range(n_device):
+        N_x[i,:] = saferound(x_dist[i]*n_obs,places=0)
+        x_dist[i] = N_x[i,:]
+    x_dist = x_dist / np.sum(x_dist,1).reshape(-1,1)
+
+    return x_dist, N_x
+
+def create_xdist3(n_device,n_class,obs_clss,n_obs):
+    x_dist = np.zeros((n_device,n_class))
+    for i in range(n_device):
+        for j in obs_clss[i]:
+            x_dist[i,j] = np.random.rand()
+    unique1 = np.concatenate(np.ones((n_device/20,1)), np.zeros((19*n_device/20,1)))
+    unique2 = np.concatenate(np.ones((n_device/20,1)), np.zeros((19*n_device/20,1)))
+    unique1 = np.random.permutation(unique1)
+    unique2 = np.random.permutation(unique2)
+    for i in range(n_device):
+        if unique1[i] == 0:
+            x_dist[0,i] = 0
+    for i in range(n_device):
+        if unique2[i] == 0:
+            x_dist[1,i] = 0
     x_dist = x_dist / np.sum(x_dist,1).reshape(-1,1)
 
     N_x = np.zeros((n_device,n_class),dtype=int)
